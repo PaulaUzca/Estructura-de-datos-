@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <windows.h>
+#include <ctime>
 using namespace std;
 
 /* Estructura de Nodo, contiene dos atributos:
@@ -132,8 +133,8 @@ public:
                 else {
                     nuevo->setPuntero(anterior->getPuntero());
                     anterior->setPuntero(nuevo);
-                    return true;
                 }
+                return true;
             }
             else {
                 return false;
@@ -191,6 +192,18 @@ public:
         return temp;
     }
 
+    void imprimirLista() {
+        cout << "\n";
+        Nodo* nodo = getFirst();
+        for (int i = 0; i < getSize(); i++) {
+            nodo->print();
+            if (nodo->getPuntero()) {
+                nodo = nodo->getPuntero();
+            }
+        }
+        cout << "\n";
+    }
+
 };
 
 
@@ -200,6 +213,29 @@ void mostrarError(string mensaje) {
     cout << mensaje << "\n";
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
 }
+
+/*
+* Una función que genere al iniciar una lista de N nodos,
+  N = (último dígito del código de estudiante) * 3
+  Los valores de cada nodo deben ser generados de forma aleatoria.
+  Realizar la comprobación de la función Insertar Nodo así:
+  Insertar el nodo H = (penúltimodigito del código) * 16, al inicio de la lista
+  Insertar el nodo I = (quinto digito del código) * 8, al final de la lista
+  Insertar el nodo J = (tercer digito del código) * 40, después del nodo con valor H
+  Insertar el nodo K = (cuartodigito del código) * 3, antes del nodo con valor I
+  */
+Lista testEstructura() {
+    Lista lista;
+    // Codigo estudiante: 2211475
+    int N = 5 * 3;
+    srand(time(0));
+    for (int i = 1; i < N; i++) {
+        lista.addEnd(new Nodo(rand(), nullptr));
+    }
+    lista.imprimirLista();
+
+}
+
 
 int main()
 {
@@ -212,13 +248,10 @@ int main()
     cin >> n;
     cout << "Ingrese los valores de la lista \n";
     int elem;
-    cout << "lista [" << 0 << "]: ";
-    cin >> elem;
     Nodo* nodo = new Nodo(elem, nullptr);
     Lista lista;
-    lista.setFirst(nodo);
 
-    for (int i = 1; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         cout << "lista [" << i << "]: ";
         cin >> elem;
         nodo = new Nodo(elem, nullptr);
@@ -339,13 +372,7 @@ int main()
         break;
     case 'f':
         // Mostrar como quedo la lista
-        nodo = lista.getFirst();
-        for (int i = 0; i < lista.getSize(); i++) {
-            nodo->print();
-            if (nodo->getPuntero()) {
-                nodo = nodo->getPuntero();
-            }
-        }
+        lista.imprimirLista();
         goto Menu;
         break;
     case 'g':
