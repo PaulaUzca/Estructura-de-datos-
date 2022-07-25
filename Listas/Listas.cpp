@@ -1,8 +1,14 @@
 #include <iostream>
 #include <vector>
+#include <windows.h>
 using namespace std;
 
+/* Estructura de Nodo, contiene dos atributos:
+* elemento: el numero que se guarda en el nodo
+* puntero: apunta al siguiente elemento de la lista, si no hay es NULO
+*/
 struct Nodo {
+private:
     int elemento;
     Nodo* puntero;
 public:
@@ -22,11 +28,17 @@ public:
     Nodo* getPuntero() {
         return puntero;
     }
-    Nodo* getPosicion() {
-        return this;
-    }
     int getNextElement() {
         return puntero->getElemento();
+    }
+    void print() {
+        cout << "[" << getElemento() << " | " << getPuntero() << "] -> ";
+        if (getPuntero()) {
+            cout << "(" << getNextElement() << ") \n";
+        }
+        else {
+            cout << "(end)";
+        }
     }
 };
 
@@ -44,77 +56,150 @@ public:
     }
     // Agrega un elemento al final de la lista
     void addEnd(Nodo* e) {
-        Nodo* temp = first;
-        while (temp->getPuntero()) {
-            temp = temp->getPuntero();
+        if (first) {
+            Nodo* temp = first;
+            while (temp->getPuntero()) {
+                temp = temp->getPuntero();
+            }
+            temp->setPuntero(e);
         }
-        temp->setPuntero(e);
+        else {
+            setFirst(e);
+        }
     }
     // Agregar un elemento al comienzo de la lista
     void addStart(Nodo* e) {
-        e->setPuntero(first);
-        first = e;
+        if (first) {
+            e->setPuntero(first);
+            first = e;
+        }
+        else {
+            setFirst(e);
+        }
     }
     //Obtener el tamaño de la lista
     int getSize() {
-        int i = 1;
-        Nodo* temp = first;
-        while (temp->getPuntero()) {
-            temp = temp->getPuntero();
-            i++;
+        int i = 0;
+        if (first) {
+            i = 1;
+            Nodo* temp = first;
+            while (temp->getPuntero()) {
+                temp = temp->getPuntero();
+                i++;
+            }
         }
         return i;
     }
     // Insertar un nodo antes del elemento X
     bool insertaNodoAntesDeElemento(int x, Nodo* nuevo) {
-        Nodo* anterior = first;
-        while (anterior->getPuntero() && anterior->getPuntero()->getElemento() != x) {
-            anterior = anterior->getPuntero();
-        }
-        if (!anterior->getPuntero()) {
-            return false;
-        }
-        else {
-            nuevo->setPuntero(anterior->getPuntero());
-            anterior->setPuntero(nuevo);
-            return true;
-        }
-    }
-    // Insertar un nodo antes del elemento X
-    bool insertaNodoDespuesDeElemento(int x, Nodo* nuevo) {
-        Nodo* anterior = first;
-        bool found = false;
-        while (anterior->getPuntero() && found) {
-            if (anterior->getElemento() == x) {
-                found = true;
-            }
-            else {
-                anterior = anterior->getPuntero();
-            }
-        }
-        if (anterior->getElemento() == x) {
-            if (!anterior->getPuntero()) {
-                addEnd(nuevo);
-            }
-            else {
-                nuevo->setPuntero(anterior->getPuntero());
-                anterior->setPuntero(nuevo);
+        if (first) {
+            Nodo* anterior = first;
+            // Si el elemento esta en la primera posicion
+            if (first->getElemento() == x) {
+                nuevo->setPuntero(first);
+                first = nuevo;
                 return true;
             }
+            else {
+                while (anterior->getPuntero() && anterior->getNextElement() != x) {
+                    anterior = anterior->getPuntero();
+                }
+                if (!anterior->getPuntero()) {
+                    return false;
+                }
+                else {
+                    nuevo->setPuntero(anterior->getPuntero());
+                    anterior->setPuntero(nuevo);
+                    return true;
+                }
+            }
         }
         else {
             return false;
         }
     }
+    // Insertar un nodo despues del elemento X
+    bool insertaNodoDespuesDeElemento(int x, Nodo* nuevo) {
+        if (first) {
+            Nodo* anterior = first;
+            while (anterior->getPuntero() && anterior->getElemento() != x) {
+                anterior = anterior->getPuntero();
+            }
+            if (anterior->getElemento() == x) {
+                if (!anterior->getPuntero()) {
+                    addEnd(nuevo);
+                }
+                else {
+                    nuevo->setPuntero(anterior->getPuntero());
+                    anterior->setPuntero(nuevo);
+                    return true;
+                }
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+    // Retorna true si el elemento esta en la lista
     bool isElementInList(int element) {
         Nodo* temp = first;
-        bool found = false;
-        while (temp->getPuntero()) {
+        while (temp->getElemento()!=element && temp->getPuntero()) {
             temp = temp->getPuntero();
         }
+        if (!temp->getPuntero() && temp->getElemento() != element) {
+            return false;
+        }
+        return true;
+    }
+    // Eliminar un nodo por el elemento
+    bool deleteNodo(int element) {
+        if (isElementInList(element)) {
+            // Si desea eliminar el primer nodo
+            if (first->getElemento() == element) {
+                first = first->getPuntero();
+            }
+            else {
+                Nodo* anterior = first;
+                // Buscar el elemento anterior al que se desea eliminar
+                while (anterior->getPuntero() && anterior->getNextElement() != element) {
+                    anterior = anterior->getPuntero();
+                }
+                // Hacer que el elemento anterior apunte al siguiente del que se desea eliminar. Si no hay siguiente que apunte a nulo
+                Nodo* nodoToDelete = anterior->getPuntero();
+                if (!nodoToDelete->getPuntero()) {
+                    anterior->setPuntero(nullptr);
+                }
+                else {
+                    anterior->setPuntero(nodoToDelete->getPuntero());
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    Nodo* buscarPorIndex(int index) {
+        int i = 0;
+        Nodo* temp = first;
+        while (temp->getPuntero() && i != index) {
+            temp = temp->getPuntero();
+            i++;
+        }
+        return temp;
     }
 
 };
+
+
+//Mostrar un mensaje de error en color rojo en la consola
+void mostrarError(string mensaje) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+    cout << mensaje << "\n";
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+}
 
 int main()
 {
@@ -142,44 +227,113 @@ int main()
 
     Menu:
     // Mostrar menu
-    char opcion, o;
-    int temp, x;
-    cout << "\na.Insertar Nodo \nb.Eliminar Nodo \nc.Buscar Nodo \nd.Tamaño de la Lista \ne.Comprobar Lista Vacía \nf.Mostrar Lista \ng.Vaciar Lista\nOpcion: ";
-    cin >> opcion;
-    switch (opcion) {
+    char opcionMenu, opcionInsertar, opcionBuscar;
+    int nuevoValor; // Valor del elemento del nuevo nodo
+    int x; // Elemento X del nodo
+    bool found;
+    cout << "\n\n\tMENU:\na.Insertar Nodo \nb.Eliminar Nodo \nc.Buscar Nodo \nd.Tamaño de la Lista \ne.Comprobar Lista Vacía \nf.Mostrar Lista \ng.Vaciar Lista\nOpcion: ";
+    cin >> opcionMenu;
+    cout << "\n";
+    switch (opcionMenu) {
     case 'a':
-        cout << "\na.Insertar Nodo al inicio \nb.Insertar Nodo al final \nc.Insertar Nodo antes del Elemento X \nd.Insertar Nodo después del Elemento X\nOpcion: ";
-        cin >> o;
+        // Insertar un nodo
+        MenuInsertar:
+        cout << "\ta.Insertar Nodo al inicio \n\tb.Insertar Nodo al final \n\tc.Insertar Nodo antes del Elemento X \n\td.Insertar Nodo después del Elemento X\n\tOpcion: ";
+        cin >> opcionInsertar;
         cout << "Nuevo elemento: ";
-        cin >> temp;
-        switch (o) {
+        cin >> nuevoValor;
+        switch (opcionInsertar) {
         case 'a':
             // Insertar nodo al inicio
-            nodo = new Nodo(temp, nullptr);
+            nodo = new Nodo(nuevoValor, nullptr);
             lista.addStart(nodo);
             break;
         case 'b':
             // Insertar nodo al final
-            lista.addEnd(new Nodo(temp, nullptr));
+            lista.addEnd(new Nodo(nuevoValor, nullptr));
             break;
         case 'c':
             // Insertar un nodo antes del elemento X
             cout << "Insertar antes del elemento de X: ";
             cin >> x;
-            bool found = lista.insertaNodoAntesDeElemento(x, new Nodo(temp, nullptr));
+            found = lista.insertaNodoAntesDeElemento(x, new Nodo(nuevoValor, nullptr));
             if (!found) {
-                cout << "No se ha encontrado el elemento X = " << x<< "\n";
+                mostrarError("No se ha encontrado el elemento X = " + x);
             }
             break;
         case 'd':
             // Insertar un nodo despues del elemento X
-            cout << "Insertar antes del elemento de X: ";
+            cout << "Insertar despues del elemento de X: ";
             cin >> x;
-            bool found = lista.insertaNodoDespuesDeElemento(x, new Nodo(temp, nullptr));
+            found = lista.insertaNodoDespuesDeElemento(x, new Nodo(nuevoValor, nullptr));
             if (!found) {
-                cout << "No se ha encontrado el elemento X = " << x << "\n";
+                mostrarError("No se ha encontrado el elemento X = " + x);
             }
             break;
+        default:
+            cout << "Opción no valida";
+            goto MenuInsertar;
+            break;
+        }
+        goto Menu;
+        break;
+    case 'b':
+        // Eliminar un nodo
+        cout << "Elemento que desea eliminar: ";
+        cin >> x;
+        found = lista.deleteNodo(x);
+        if (!found) {
+            mostrarError("El elemento que desea eliminar no se encuentra en la lista = " + x);
+        }
+        goto Menu;
+        break;
+    case 'c':
+        // Buscar nodo
+        MenuBuscar:
+        cout << "\t\ta. Buscar por posicion\n\t\tb. Buscar por elemento\n\t\tOpcion: ";
+        cin >> opcionBuscar;
+        switch (opcionBuscar) {
+        case 'a':
+            int index;
+            cout << "Index (empezando en 0): ";
+            cin >> index;
+            if (index > lista.getSize()) {
+                cout << "El index esta fuera de los limites";
+            }
+            else {
+                lista.buscarPorIndex(index)->print();
+            }
+            break;
+        case 'b':
+            int elemento;
+            cout << "Elemento: ";
+            cin >> elemento;
+            if (lista.isElementInList(elemento)) {
+                cout << elemento <<" esta en la lista";
+            }
+            else {
+                cout << elemento << " no esta en la lista";
+            }
+        default:
+            cout << "Opcion no valida";
+            goto MenuBuscar;
+            break;
+        }
+        goto Menu;
+        break;
+    case 'd':
+        // Tamaño de la lista
+        cout << "Tamaño de la lista: " << lista.getSize();
+        goto Menu;
+        break;
+        // 
+    case 'e':
+        // Comprobar lista vacia
+        if (lista.getFirst()) {
+            cout << "Lista NO vacia";
+        }
+        else {
+            cout << "Lista vacia";
         }
         goto Menu;
         break;
@@ -187,16 +341,28 @@ int main()
         // Mostrar como quedo la lista
         nodo = lista.getFirst();
         for (int i = 0; i < lista.getSize(); i++) {
-            cout << "[" << nodo->getElemento() << " | " << nodo->getPuntero() << "] -> ";
+            nodo->print();
             if (nodo->getPuntero()) {
                 nodo = nodo->getPuntero();
-                cout << "(" << nodo->getElemento() << ") \n";
-            }
-            else {
-                cout << "(end)";
             }
         }
         goto Menu;
         break;
+    case 'g':
+        // Vaciar lista
+        if (lista.getSize()) {
+            lista.setFirst(nullptr);
+            cout << "Se ha vaciado la lista";
+        }
+        else {
+            cout << "La lista ya estaba vacia";
+        }
+        goto Menu;
+        break;
+    default:
+        cout << "Opcion no valida";
+        goto Menu;
+        break;
     }
 }
+
