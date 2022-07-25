@@ -2,12 +2,11 @@
 #include <vector>
 using namespace std;
 
-class Nodo {
-private:
+struct Nodo {
     int elemento;
-    int* puntero;
+    Nodo* puntero;
 public:
-    Nodo(int element, int* pointer) {
+    Nodo(int element, Nodo* pointer) {
         elemento = element;
         puntero = pointer;
     }
@@ -17,18 +16,104 @@ public:
     int getElemento() {
         return elemento;
     }
-    void setPuntero(int* pPuntero) {
+    void setPuntero(Nodo* pPuntero) {
         puntero = pPuntero;
     }
-    int* getPuntero() {
+    Nodo* getPuntero() {
         return puntero;
     }
-    int* getPosicionElemento() {
-        return &elemento;
+    Nodo* getPosicion() {
+        return this;
     }
     int getNextElement() {
-        return *puntero;
+        return puntero->getElemento();
     }
+};
+
+class Lista {
+private:
+    Nodo* first;
+public:
+    // Inicializar el primer nodo de la lista
+    void setFirst(Nodo* primerNodo) {
+        first = primerNodo;
+    }
+    // Obtener el primer nodo
+    Nodo* getFirst() {
+        return first;
+    }
+    // Agrega un elemento al final de la lista
+    void addEnd(Nodo* e) {
+        Nodo* temp = first;
+        while (temp->getPuntero()) {
+            temp = temp->getPuntero();
+        }
+        temp->setPuntero(e);
+    }
+    // Agregar un elemento al comienzo de la lista
+    void addStart(Nodo* e) {
+        e->setPuntero(first);
+        first = e;
+    }
+    //Obtener el tamaño de la lista
+    int getSize() {
+        int i = 1;
+        Nodo* temp = first;
+        while (temp->getPuntero()) {
+            temp = temp->getPuntero();
+            i++;
+        }
+        return i;
+    }
+    // Insertar un nodo antes del elemento X
+    bool insertaNodoAntesDeElemento(int x, Nodo* nuevo) {
+        Nodo* anterior = first;
+        while (anterior->getPuntero() && anterior->getPuntero()->getElemento() != x) {
+            anterior = anterior->getPuntero();
+        }
+        if (!anterior->getPuntero()) {
+            return false;
+        }
+        else {
+            nuevo->setPuntero(anterior->getPuntero());
+            anterior->setPuntero(nuevo);
+            return true;
+        }
+    }
+    // Insertar un nodo antes del elemento X
+    bool insertaNodoDespuesDeElemento(int x, Nodo* nuevo) {
+        Nodo* anterior = first;
+        bool found = false;
+        while (anterior->getPuntero() && found) {
+            if (anterior->getElemento() == x) {
+                found = true;
+            }
+            else {
+                anterior = anterior->getPuntero();
+            }
+        }
+        if (anterior->getElemento() == x) {
+            if (!anterior->getPuntero()) {
+                addEnd(nuevo);
+            }
+            else {
+                nuevo->setPuntero(anterior->getPuntero());
+                anterior->setPuntero(nuevo);
+                return true;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+    bool isElementInList(int element) {
+        Nodo* temp = first;
+        bool found = false;
+        while (temp->getPuntero()) {
+            temp = temp->getPuntero();
+        }
+    }
+
 };
 
 int main()
@@ -41,23 +126,21 @@ int main()
     int n;
     cin >> n;
     cout << "Ingrese los valores de la lista \n";
-    vector<Nodo> lista;
     int elem;
-    for (int i = 0; i < n; i++) {
+    cout << "lista [" << 0 << "]: ";
+    cin >> elem;
+    Nodo* nodo = new Nodo(elem, nullptr);
+    Lista lista;
+    lista.setFirst(nodo);
+
+    for (int i = 1; i < n; i++) {
         cout << "lista [" << i << "]: ";
         cin >> elem;
-        lista.push_back(Nodo(elem, 0));
-    }
-    for (int i = 0; i < n; i++) {
-        if (i != n - 1) {
-            lista[i].setPuntero(lista[i + 1].getPosicionElemento());
-        }
-        else {
-            lista[i].setPuntero(0);
-        }
+        nodo = new Nodo(elem, nullptr);
+        lista.addEnd(nodo);
     }
 
-Menu:
+    Menu:
     // Mostrar menu
     char opcion, o;
     int temp, x;
@@ -72,52 +155,29 @@ Menu:
         switch (o) {
         case 'a':
             // Insertar nodo al inicio
-            lista.insert(lista.begin(), Nodo(temp, lista[0].getPosicionElemento()));
-            // Toca volver a asignar las posiciones de los nodos (?)
-            for (int i = 0; i < lista.size(); i++) {
-                if (i != lista.size() - 1) {
-                    lista[i].setPuntero(lista[i + 1].getPosicionElemento());
-                }
-                else {
-                    lista[i].setPuntero(0);
-                }
-            }
+            nodo = new Nodo(temp, nullptr);
+            lista.addStart(nodo);
             break;
         case 'b':
             // Insertar nodo al final
-            lista.push_back(Nodo(temp, 0));
-            // Asignar la posicion del ultimo elemento a este
-            lista[lista.size() - 2].setPuntero(lista[lista.size() - 2].getPosicionElemento());
+            lista.addEnd(new Nodo(temp, nullptr));
             break;
         case 'c':
-        ElementoX:
             // Insertar un nodo antes del elemento X
             cout << "Insertar antes del elemento de X: ";
             cin >> x;
-            int posicion, i = 0;
-            bool found = false, salir = false;
-            while (!found) {
-                if (lista[i].getElemento() == x) {
-                    posicion = i;
-                    found = true;
-                }
-                i++;
-                if (i == lista.size()) {
-                    cout << "No se ha encontrado el elemento " << x << "en la lista \nDesea volver  ingresar x (0) o volver al menu (1)";
-                    cin >> salir;
-                    if (!salir) {
-                        goto Menu;
-                    }
-                    else {
-                        goto ElementoX;
-                    }
-                }
+            bool found = lista.insertaNodoAntesDeElemento(x, new Nodo(temp, nullptr));
+            if (!found) {
+                cout << "No se ha encontrado el elemento X = " << x<< "\n";
             }
-            if (posicion == 0) {
-                lista.insert(lista.begin(), Nodo(temp, lista[posicion].getPosicionElemento()));
-            }
-            else {
-                lista.insert(lista.begin() + posicion - 1, Nodo(temp, lista[posicion].getPosicionElemento()));
+            break;
+        case 'd':
+            // Insertar un nodo despues del elemento X
+            cout << "Insertar antes del elemento de X: ";
+            cin >> x;
+            bool found = lista.insertaNodoDespuesDeElemento(x, new Nodo(temp, nullptr));
+            if (!found) {
+                cout << "No se ha encontrado el elemento X = " << x << "\n";
             }
             break;
         }
@@ -125,17 +185,18 @@ Menu:
         break;
     case 'f':
         // Mostrar como quedo la lista
-        for (int i = 0; i < lista.size(); i++) {
-            cout << "[" << lista[i].getElemento() << " | " << lista[i].getPuntero() << "] -> ";
-            if (i != lista.size() - 1) {
-                cout << "(" << lista[i].getNextElement() << ") \n";
+        nodo = lista.getFirst();
+        for (int i = 0; i < lista.getSize(); i++) {
+            cout << "[" << nodo->getElemento() << " | " << nodo->getPuntero() << "] -> ";
+            if (nodo->getPuntero()) {
+                nodo = nodo->getPuntero();
+                cout << "(" << nodo->getElemento() << ") \n";
             }
             else {
-                cout << "(end) \n";
+                cout << "(end)";
             }
         }
         goto Menu;
         break;
     }
-
 }
