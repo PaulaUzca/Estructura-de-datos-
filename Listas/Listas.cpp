@@ -46,6 +46,9 @@ public:
     }
 };
 
+/* Lista de nodos, contiene el nodo inicial de la lista,
+y metodos para insertra, buscar o eliminar los nodos que le siguen al primero
+*/
 class Lista {
 private:
     Nodo* first;
@@ -245,7 +248,7 @@ void mostrarError(string mensaje) {
   Insertar el nodo J = (tercer digito del código) * 40, después del nodo con valor H
   Insertar el nodo K = (cuartodigito del código) * 3, antes del nodo con valor I
   */
-Lista testEstructura() {
+void testEstructura() {
     Lista lista;
     // Codigo estudiante: 2211475
     int N = 5 * 3, 
@@ -275,8 +278,6 @@ Lista testEstructura() {
     cout << "\n\nInsertar nodo K (" << K << ") antes de nodo I (" << I << ")";
     lista.insertaNodoAntesDeElemento(I, new Nodo(K, nullptr));
     lista.imprimirListaIndex();
-    return lista;
-
 }
 
 /* Actividad #1 de menu para modificar una lista*/
@@ -439,7 +440,7 @@ Menu:
 int main()
 {
     // Actividad evaluativa #1
-    Lista lista = testEstructura();
+    testEstructura();
 
     // Taller #1 de listas
     //showMenu();
