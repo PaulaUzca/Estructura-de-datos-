@@ -32,7 +32,7 @@ public:
     int getNextElement() {
         return puntero->getElemento();
     }
-    void print() {
+    void printCompleto() {
         cout << "[" << getElemento() << " | " << getPuntero() << "] -> ";
         if (getPuntero()) {
             cout << "(" << getNextElement() << ") \n";
@@ -41,12 +41,18 @@ public:
             cout << "(end)";
         }
     }
+    void print() {
+        cout << "[" << getElemento()<<"]\n";
+    }
 };
 
 class Lista {
 private:
     Nodo* first;
 public:
+    Lista() {
+        first = nullptr;
+    }
     // Inicializar el primer nodo de la lista
     void setFirst(Nodo* primerNodo) {
         first = primerNodo;
@@ -146,6 +152,9 @@ public:
     }
     // Retorna true si el elemento esta en la lista
     bool isElementInList(int element) {
+        if (!first) {
+            return false;
+        }
         Nodo* temp = first;
         while (temp->getElemento()!=element && temp->getPuntero()) {
             temp = temp->getPuntero();
@@ -196,14 +205,25 @@ public:
         cout << "\n";
         Nodo* nodo = getFirst();
         for (int i = 0; i < getSize(); i++) {
-            nodo->print();
+            nodo->printCompleto();
             if (nodo->getPuntero()) {
                 nodo = nodo->getPuntero();
             }
         }
         cout << "\n";
     }
-
+    void imprimirListaIndex() {
+        cout << "\nIndex\tElemento-Memoria\tApunta a\n";
+        Nodo* nodo = getFirst();
+        for (int i = 0; i < getSize(); i++) {
+            cout << "(" << i <<") - ";
+            nodo->printCompleto();
+            if (nodo->getPuntero()) {
+                nodo = nodo->getPuntero();
+            }
+        }
+        cout << "\n";
+    }
 };
 
 
@@ -215,7 +235,8 @@ void mostrarError(string mensaje) {
 }
 
 /*
-* Una función que genere al iniciar una lista de N nodos,
+* Actividad evaluativa para probar la lista
+  Una función que genere al iniciar una lista de N nodos,
   N = (último dígito del código de estudiante) * 3
   Los valores de cada nodo deben ser generados de forma aleatoria.
   Realizar la comprobación de la función Insertar Nodo así:
@@ -227,28 +248,49 @@ void mostrarError(string mensaje) {
 Lista testEstructura() {
     Lista lista;
     // Codigo estudiante: 2211475
-    int N = 5 * 3;
+    int N = 5 * 3, 
+        H = 7 * 16,
+        I = 4 * 8,
+        J = 1 * 40,
+        K = 1 * 3;
     srand(time(0));
-    for (int i = 1; i < N; i++) {
-        lista.addEnd(new Nodo(rand(), nullptr));
+    for (int i = 0; i < N; i++) {
+        lista.addEnd(new Nodo(rand() % 100, nullptr));
     }
-    lista.imprimirLista();
+    cout << "Lista de tamaño " << N << " con numeros aleatorios";
+    lista.imprimirListaIndex();
+    // Insertar nodo H
+    cout << "\n\nInsertar nodo H ("<< H <<") al comienzo";
+    lista.addStart(new Nodo(H, nullptr));
+    lista.imprimirListaIndex();
+    // Insertar nodo I
+    cout << "\n\nInsertar nodo I (" << I << ") al final";
+    lista.addEnd(new Nodo(I, nullptr));
+    lista.imprimirListaIndex();
+    // Insertar nodo J
+    cout << "\n\nInsertar nodo J (" << J << ") despues de nodo H ("<< H <<")";
+    lista.insertaNodoDespuesDeElemento(H, new Nodo(J, nullptr));
+    lista.imprimirListaIndex();
+    // Insertar nodo K
+    cout << "\n\nInsertar nodo K (" << K << ") antes de nodo I (" << I << ")";
+    lista.insertaNodoAntesDeElemento(I, new Nodo(K, nullptr));
+    lista.imprimirListaIndex();
+    return lista;
 
 }
 
-
-int main()
-{
+/* Actividad #1 de menu para modificar una lista*/
+void showMenu() {
     /*
-    El programa de iniciar creando una Lista de N nodos.
-    Debe pedirse al usuario el número N de nodos iniciales de la lista y leer cada uno de los valores.
-    */
+  El programa de iniciar creando una Lista de N nodos.
+  Debe pedirse al usuario el número N de nodos iniciales de la lista y leer cada uno de los valores.
+  */
     cout << "Numero de nodos de la lista: ";
     int n;
     cin >> n;
     cout << "Ingrese los valores de la lista \n";
     int elem;
-    Nodo* nodo = new Nodo(elem, nullptr);
+    Nodo* nodo;
     Lista lista;
 
     for (int i = 0; i < n; i++) {
@@ -258,19 +300,19 @@ int main()
         lista.addEnd(nodo);
     }
 
-    Menu:
+Menu:
     // Mostrar menu
     char opcionMenu, opcionInsertar, opcionBuscar;
     int nuevoValor; // Valor del elemento del nuevo nodo
     int x; // Elemento X del nodo
     bool found;
-    cout << "\n\n\tMENU:\na.Insertar Nodo \nb.Eliminar Nodo \nc.Buscar Nodo \nd.Tamaño de la Lista \ne.Comprobar Lista Vacía \nf.Mostrar Lista \ng.Vaciar Lista\nOpcion: ";
+    cout << "\n\nMENU:\na.Insertar Nodo \nb.Eliminar Nodo \nc.Buscar Nodo \nd.Tamaño de la Lista \ne.Comprobar Lista Vacía \nf.Mostrar Lista \ng.Vaciar Lista\nOpcion: ";
     cin >> opcionMenu;
     cout << "\n";
     switch (opcionMenu) {
     case 'a':
         // Insertar un nodo
-        MenuInsertar:
+    MenuInsertar:
         cout << "\ta.Insertar Nodo al inicio \n\tb.Insertar Nodo al final \n\tc.Insertar Nodo antes del Elemento X \n\td.Insertar Nodo después del Elemento X\n\tOpcion: ";
         cin >> opcionInsertar;
         cout << "Nuevo elemento: ";
@@ -287,11 +329,11 @@ int main()
             break;
         case 'c':
             // Insertar un nodo antes del elemento X
-            cout << "Insertar antes del elemento de X: ";
+            cout << "Insertar antes del elemento X: ";
             cin >> x;
             found = lista.insertaNodoAntesDeElemento(x, new Nodo(nuevoValor, nullptr));
             if (!found) {
-                mostrarError("No se ha encontrado el elemento X = " + x);
+                mostrarError("No se ha encontrado el elemento X");
             }
             break;
         case 'd':
@@ -300,7 +342,7 @@ int main()
             cin >> x;
             found = lista.insertaNodoDespuesDeElemento(x, new Nodo(nuevoValor, nullptr));
             if (!found) {
-                mostrarError("No se ha encontrado el elemento X = " + x);
+                mostrarError("No se ha encontrado el elemento X");
             }
             break;
         default:
@@ -322,7 +364,7 @@ int main()
         break;
     case 'c':
         // Buscar nodo
-        MenuBuscar:
+    MenuBuscar:
         cout << "\t\ta. Buscar por posicion\n\t\tb. Buscar por elemento\n\t\tOpcion: ";
         cin >> opcionBuscar;
         switch (opcionBuscar) {
@@ -342,11 +384,12 @@ int main()
             cout << "Elemento: ";
             cin >> elemento;
             if (lista.isElementInList(elemento)) {
-                cout << elemento <<" esta en la lista";
+                cout << elemento << " esta en la lista";
             }
             else {
                 cout << elemento << " no esta en la lista";
             }
+        break;
         default:
             cout << "Opcion no valida";
             goto MenuBuscar;
@@ -391,5 +434,14 @@ int main()
         goto Menu;
         break;
     }
+}
+
+int main()
+{
+    // Actividad evaluativa #1
+    Lista lista = testEstructura();
+
+    // Taller #1 de listas
+    //showMenu();
 }
 
