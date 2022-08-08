@@ -8,7 +8,7 @@ private:
     int tope = 0;
     int max = 0;
 public:
-    Pila(int *arr, int size) {
+    Pila(int* arr, int size) {
         array = arr;
         max = size;
     }
