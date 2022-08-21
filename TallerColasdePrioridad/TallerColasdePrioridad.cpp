@@ -178,7 +178,7 @@ public:
         return false;
     }
 
-    // Cambiar la gravedad segun la edad del paciente. Si esta entre 12 y 65 años no le cambie la prioridad
+    // Cambiar la gravedad segun la edad del paciente. Si esta entre 12 y 65 años pongale gravedad 4
     int getGravedadPorEdad(Paciente paciente) {
         if (gravedadRepetida(paciente)) {
             if (paciente.getEdad() < 12) {
@@ -187,6 +187,7 @@ public:
             if (paciente.getEdad() > 65) {
                 return 2;
             }
+            return 4;
         }
         return paciente.getGravedad();
     }
