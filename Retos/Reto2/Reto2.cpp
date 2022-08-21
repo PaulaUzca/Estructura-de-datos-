@@ -20,6 +20,8 @@ int main()
         array.push_back(e);
     }
 
+
+
     vector<int[4]> cuartetos;
     int suma;
     cout << "Ingrese una suma: ";
