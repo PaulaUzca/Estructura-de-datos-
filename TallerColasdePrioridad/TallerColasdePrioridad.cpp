@@ -228,8 +228,13 @@ int main()
             cin >> edad;
             cout << "Sintomas o motivo de la consulta: ";
             getline(cin >> ws, sintomas);
+            Gravedad:
             cout << "Gravedad (Escala numérica de 1 a 5 siendo 1 la mayor gravedad): ";
             cin >> gravedad;
+            if (gravedad > 5 || gravedad < 1) {
+                cout << "Gravedad debe ser entre 1 y 5\n";
+                goto Gravedad;
+            }
             paciente = Paciente(nombre, edad, sintomas, gravedad);
 
             // Asignar gravedad por prioridad
