@@ -11,12 +11,13 @@ private:
     int edad;
     string sintomas;
     int gravedad;
+    float prioridad;
 public:
     Paciente() {
 
     }
     Paciente(string nombre, int edad, string sintomas, int gravedad) {
-        this->nombre= nombre;
+        this->nombre = nombre;
         this->edad = edad;
         this->sintomas = sintomas;
         this->gravedad = gravedad;
@@ -36,8 +37,14 @@ public:
     string getNombre() {
         return nombre;
     }
+    float getPrioridad() {
+        return prioridad;
+    }
+    void setPrioridad(float prioridad) {
+        this->prioridad = prioridad;
+    }
     void imprimirPaciente() {
-        cout << nombre << "(Edad: " << edad <<" Gravedad: "<< gravedad <<")\n";
+        cout << nombre << "(Edad: " << edad << " Gravedad: " << gravedad << ")\n";
     }
 };
 
@@ -48,7 +55,7 @@ private:
     Nodo* prev;
 public:
     Nodo(Paciente elemento) {
-        this->elemento=elemento;
+        this->elemento = elemento;
         this->next = nullptr;
         this->prev = nullptr;
     }
@@ -62,7 +69,7 @@ public:
     Paciente getElemento() {
         return elemento;
     }
-    void setNext(Nodo* nodo ) {
+    void setNext(Nodo* nodo) {
         this->next = nodo;
     }
     void setPrev(Nodo* nodo) {
@@ -74,12 +81,12 @@ class Cola {
 private:
     Nodo* first;
     // Encontrar el nodo con gravedad menor que el paciente
-    void agregaAntesDeNodoConGravedadMenorQue(Nodo* paciente){
+    void agregaAntesDeNodoConGravedadMenorQue(Nodo* paciente) {
         Nodo* menor = first;
-        while (menor->getNext() != nullptr && menor->getElemento().getGravedad() <= paciente->getElemento().getGravedad()) {
+        while (menor->getNext() != nullptr && menor->getElemento().getPrioridad() <= paciente->getElemento().getPrioridad()) {
             menor = menor->getNext();
         }
-        if (menor->getElemento().getGravedad() > paciente->getElemento().getGravedad()) {
+        if (menor->getElemento().getPrioridad() > paciente->getElemento().getPrioridad()) {
             if (menor == first) {
                 setFirst(paciente);
             }
@@ -179,17 +186,14 @@ public:
     }
 
     // Cambiar la gravedad segun la edad del paciente. Si esta entre 12 y 65 años pongale gravedad 4
-    int getGravedadPorEdad(Paciente paciente) {
-        if (gravedadRepetida(paciente)) {
+    float getPrioridadPorEdad(Paciente paciente) {
             if (paciente.getEdad() < 12) {
-                return 1;
+                return 0.1;
             }
             if (paciente.getEdad() > 65) {
-                return 2;
+                return 0.2;
             }
-            return 4;
-        }
-        return paciente.getGravedad();
+            return 0.4;
     }
 
     void imprimirCola() {
@@ -237,8 +241,8 @@ int main()
             }
             paciente = Paciente(nombre, edad, sintomas, gravedad);
 
-            // Asignar gravedad por prioridad
-            paciente.setGravedad(cola.getGravedadPorEdad(paciente));
+            // Asignar prioridad por edad
+            paciente.setPrioridad(paciente.getGravedad() + cola.getPrioridadPorEdad(paciente));
 
             cola.queue(paciente);
         }
