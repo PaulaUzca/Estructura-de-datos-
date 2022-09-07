@@ -21,7 +21,6 @@ public:
 			cout << "Hijo " << i + 1 << ":";
 			cin >> e;
 			TreeNode* child = new TreeNode(e);
-			cout << "\t";
 			fillTree(child);
 			nodo->addChild(child);
 		}
